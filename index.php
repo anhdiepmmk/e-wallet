@@ -14,6 +14,8 @@ echo '2. I am a returning customer' . PHP_EOL;
 echo '3. Exit' . PHP_EOL;
 echo '--------------------------' . PHP_EOL;
 
+\Utils\Console::write('hiiiiiiiiiiiiiiiii',\Utils\Console::COLOR_RED);
+
 $choice = \Utils\Console::readLine();
 
 $account = new \Models\Account();
