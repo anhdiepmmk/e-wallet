@@ -10,6 +10,7 @@ use Utils\Console;
 use Utils\Log;
 use Models\Account;
 use Models\Constant;
+use Models\Customer;
 
 class Program
 {
@@ -61,13 +62,14 @@ class Program
                 $customer = new \Models\Customer();
                 $customer->setId($id);
 
+                //Check customer id is unique
                 if ($customer->isUnique($this->customers)) {
                     //store new customer to array
                     $this->customers[] = $customer;
                     $this->customer = $customer;
 
                     //write this event to logs folder
-                    Log::info(' Create new customer with id ' . $customer->getId());
+                    Log::info('Create new customer with id ' . $customer->getId());
 
                     //break this loop
                     $flag = false;
@@ -87,6 +89,14 @@ class Program
     function login()
     {
         Console::writeLine('Welcome back guest, tell me your id: ');
+        $id = trim(Console::readLine());
+
+        $customer = new  Customer(false);
+        $result = $customer->login($id,$this->customers);
+
+        if($result){
+        }else{
+        }
     }
 
     /**

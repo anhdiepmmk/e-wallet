@@ -15,14 +15,34 @@ class Customer
     private $defaultAccount;
     private $accounts = array();
 
-    function __construct()
+    function __construct($wantInit = true)
     {
-        $virtualAccount = new Account();
-        $usdAccount = new Account();
+        if($wantInit){
+            $virtualAccount = new Account();
+            $usdAccount = new Account();
 
-        //add two account to this array
-        $accounts[]  = $virtualAccount;
-        $accounts[]  = $usdAccount;
+            //add two account to this array
+            $accounts[]  = $virtualAccount;
+            $accounts[]  = $usdAccount;
+        }
+    }
+
+    /**
+     * Do login
+     * @param $id
+     * @param array $customers
+     * @return bool
+     */
+    public function login($id, array $customers){
+        if(count($customers) > 0){
+            for ($i = 0; $i < count($customers); ++$i) {
+                $item = $customers[$i];
+                if ($id == $item->id) {
+                    return $item;
+                }
+            }
+        }
+        return false;
     }
 
     /**
