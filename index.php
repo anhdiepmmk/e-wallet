@@ -94,7 +94,8 @@ class Program
         $customer = new  Customer(false);
         $result = $customer->login($id,$this->customers);
 
-        if($result){
+        if($result instanceof Customer){
+
         }else{
         }
     }
