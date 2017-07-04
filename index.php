@@ -5,7 +5,7 @@
  * Date: 7/4/2017
  * Time: 8:15 AM
  */
-include 'autoload.php';
+include '__autoload.php';
 
 //print to screen menu choice
 echo 'Welcome to E-Wallet System' . PHP_EOL;
