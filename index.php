@@ -11,63 +11,124 @@ use Utils\Log;
 use Models\Account;
 use Models\Constant;
 
-echo '.................' . \Utils\CurrencyConverter::convert(22000, 'VND','USD');
-
-
-/**
- * Print Menu Main to screen
- */
-function printMenuMain()
+class Program
 {
-    Console::writeLine('Welcome to E-Wallet System');
-    Console::writeLine('1. I am a new customer');
-    Console::writeLine('2. I am a returning customer');
-    Console::writeLine('3. Exit');
-    Console::writeLine('--------------------------');
-}
+    var $customers = array();
+    var $customer = null;
 
-/**
- * Create new wallet
- */
-function register()
-{
-    Console::writeLine('Hello new user');
-}
-
-/**
- * Login to exist wallet
- */
-function login(){
-    Console::writeLine('Welcome back');
-}
-
-/**
- * Exit this program
- */
-function quit(){
-    exit('Thanks for your visit. See you later');
-}
-
-
-do {
-    //print to screen menu choice and wait input from user
-    printMenuMain();
-    $choice = Console::readLine();
-
-    switch ($choice) {
-        case Constant::MENU_MAIN_NEW_CUSTOMER:
-            register();
-            break;
-        case Constant::MENU_MAIN_RETURNING_CUSTOMER:
-            login();
-            break;
-        case Constant::MENU_MAIN_EXIT:
-            quit();
-            break;
-        default:
-            Console::writeLine('Please enter correct choice');
-            break;
+    /**
+     * Print Menu Main to screen
+     */
+    function printMenuMain()
+    {
+        Console::writeLine('------------------------------');
+        Console::writeLine('Welcome to E-Wallet System');
+        Console::writeLine('1. I am a new customer');
+        Console::writeLine('2. I am a returning customer');
+        Console::writeLine('3. Exit');
+        Console::writeLine('------------------------------');
     }
-} while (true);
 
-$account = new Account();
+    /**
+     * Print Menu Customer to screen
+     */
+    function printMenuCustomer()
+    {
+        Console::writeLine('------------------------------');
+        Console::writeLine($this->customer->getId() . ' welcome to E-Wallet System');
+        Console::writeLine('1. Get list account');
+        Console::writeLine('2. Transfer your money');
+        Console::writeLine('2. Widraw your money');
+        Console::writeLine('2. Deposit your money');
+        Console::writeLine('3. Exit');
+        Console::writeLine('------------------------------');
+    }
+
+    /**
+     * Create new wallet
+     */
+    function register()
+    {
+        Console::writeLine('Hello new user let choose your unique id: ');
+
+        //when all things are correct flag will be false value to end this loop
+        $flag = true;
+        do {
+            $id = trim(Console::readLine());
+
+            if (strlen($id) > 0) {
+                //create new customer
+                $customer = new \Models\Customer();
+                $customer->setId($id);
+
+                if ($customer->isUnique($this->customers)) {
+                    //store new customer to array
+                    $this->customers[] = $customer;
+                    $this->customer = $customer;
+
+                    //write this event to logs folder
+                    Log::info(' Create new customer with id ' . $customer->getId());
+
+                    //break this loop
+                    $flag = false;
+                } else {
+                    Console::writeLine("Your id already existing, please choose new unique id: ");
+                }
+            } else {
+                Console::writeLine("Id can not be empty, please choose new unique id: ");
+            }
+        } while ($flag);
+
+    }
+
+    /**
+     * Login to exist wallet
+     */
+    function login()
+    {
+        Console::writeLine('Welcome back guest, tell me your id: ');
+    }
+
+    /**
+     * Exit this program
+     */
+    function quit()
+    {
+        exit('Thanks for your visit. See you later');
+    }
+
+    public function main()
+    {
+        do {
+            //print to screen menu choice and wait input from user
+            $this->printMenuMain();
+            $choice = Console::readLine();
+
+            switch ($choice) {
+                case Constant::MENU_MAIN_NEW_CUSTOMER:
+                    $this->register();
+                    break;
+                case Constant::MENU_MAIN_RETURNING_CUSTOMER:
+                    $this->login();
+                    break;
+                case Constant::MENU_MAIN_EXIT:
+                    $this->quit();
+                    break;
+                default:
+                    Console::writeLine('Please enter correct choice');
+                    break;
+            }
+        } while (true);
+
+        $account = new Account();
+    }
+}
+
+//invoke main function, main function is where first call
+$program = new Program();
+$program->main();
+
+
+
+
+

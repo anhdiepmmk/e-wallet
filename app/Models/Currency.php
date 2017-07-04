@@ -11,8 +11,8 @@ namespace Models;
 
 class Currency
 {
-    var $code;
-    var $countryName;
+    private $code;
+    private $countryName;
 
     /**
      * Currency constructor.

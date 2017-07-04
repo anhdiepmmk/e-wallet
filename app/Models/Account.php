@@ -11,22 +11,9 @@ namespace Models;
 
 class Account
 {
-    var $id;
-    var $currency;
-    var $amount;
-
-    /**
-     * Account constructor.
-     * @param $id
-     * @param $currency
-     * @param $amount
-     */
-    public function __construct($id, $currency, $amount)
-    {
-        $this->id = $id;
-        $this->currency = $currency;
-        $this->amount = $amount;
-    }
+    private $id;
+    private $currency;
+    private $amount;
 
 
     /**

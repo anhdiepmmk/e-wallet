@@ -11,13 +11,38 @@ namespace Models;
 
 class Customer
 {
-    var $id;
-    var $defaultAccount;
-    var $accounts = array();
+    private $id;
+    private $defaultAccount;
+    private $accounts = array();
 
     function __construct()
     {
+        $virtualAccount = new Account();
+        $usdAccount = new Account();
 
+        //add two account to this array
+        $accounts[]  = $virtualAccount;
+        $accounts[]  = $usdAccount;
+    }
+
+    /**
+     * Check customer unique by id
+     * @param array $customers
+     * @return bool
+     */
+    public function isUnique(array $customers)
+    {
+        //if $customers bigger than 0 ~> need check. else just return true
+        if (count($customers) > 0) {
+            for ($i = 0; $i < count($customers); ++$i) {
+                $item = $customers[$i];
+                if ($this->id == $item->id) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
