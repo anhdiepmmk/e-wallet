@@ -25,7 +25,7 @@ class Log
      * @param $message
      * @param array $data
      */
-    public static function write($level, $message, array $data)
+    public static function write($level, $message, array $data = array())
     {
         $fileName = date("m-d-Y") . '.log';
         $filePath = self::LOG_FOLDER . DIRECTORY_SEPARATOR . $fileName;
@@ -42,7 +42,7 @@ class Log
      * @param $message
      * @param array $data
      */
-    public static function warning($message, array $data)
+    public static function warning($message, array $data = array())
     {
         self::write(self::LEVEL_WARNING, $message, $data);
     }
@@ -52,7 +52,7 @@ class Log
      * @param $message
      * @param array $data
      */
-    public static function error($message, array $data)
+    public static function error($message, array $data = array())
     {
         self::write(self::LEVEL_ERROR, $message, $data);
     }
@@ -62,7 +62,7 @@ class Log
      * @param $message
      * @param array $data
      */
-    public static function info($message, array $data)
+    public static function info($message, array $data = array())
     {
         self::write(self::LEVEL_INFO, $message, $data);
     }
@@ -72,7 +72,7 @@ class Log
      * @param $message
      * @param array $data
      */
-    public static function debug($message, array $data)
+    public static function debug($message, array $data = array())
     {
         self::write(self::LEVEL_DEBUG, $message, $data);
     }

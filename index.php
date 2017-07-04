@@ -9,7 +9,9 @@ include '__autoload.php';
 use Utils\Console;
 use Utils\Log;
 use Models\Account;
-use Models\Constants;
+use Models\Constant;
+
+echo '.................' . \Utils\CurrencyConverter::convert(22000, 'VND','USD');
 
 
 /**
@@ -22,26 +24,45 @@ function printMenuMain()
     Console::writeLine('2. I am a returning customer');
     Console::writeLine('3. Exit');
     Console::writeLine('--------------------------');
+}
 
-    Log::warning('Print menu...',array());
+/**
+ * Create new wallet
+ */
+function register()
+{
+    Console::writeLine('Hello new user');
+}
+
+/**
+ * Login to exist wallet
+ */
+function login(){
+    Console::writeLine('Welcome back');
+}
+
+/**
+ * Exit this program
+ */
+function quit(){
+    exit('Thanks for your visit. See you later');
 }
 
 
 do {
-
     //print to screen menu choice and wait input from user
     printMenuMain();
     $choice = Console::readLine();
 
     switch ($choice) {
-        case Constants::MENU_MAIN_NEW_CUSTOMER:
-            Console::writeLine('Hello new user');
+        case Constant::MENU_MAIN_NEW_CUSTOMER:
+            register();
             break;
-        case Constants::MENU_MAIN_RETURNING_CUSTOMER:
-            Console::writeLine('Welcome back');
+        case Constant::MENU_MAIN_RETURNING_CUSTOMER:
+            login();
             break;
-        case Constants::MENU_MAIN_EXIT:
-            Console::writeLine('Thanks for your visit. See you later');
+        case Constant::MENU_MAIN_EXIT:
+            quit();
             break;
         default:
             Console::writeLine('Please enter correct choice');
