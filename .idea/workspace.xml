@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="718632a4-dc35-429b-8ca1-af021b272fbc" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/index.php" afterPath="$PROJECT_DIR$/index.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,10 +30,10 @@
       <file leaf-file-name="index.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="263">
-              <caret line="54" column="59" lean-forward="false" selection-start-line="54" selection-start-column="59" selection-end-line="54" selection-end-column="59" />
+            <state relative-caret-position="0">
+              <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
               <folding>
-                <element signature="e#119#137#0#PHP" expanded="true" />
+                <element signature="e#138#156#0#PHP" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -361,12 +362,12 @@
       <workItem from="1499130864383" duration="28569000" />
       <workItem from="1499164974493" duration="9633000" />
       <workItem from="1499251506604" duration="57000" />
-      <workItem from="1499251673604" duration="2038000" />
+      <workItem from="1499251673604" duration="2161000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40297000" />
+    <option name="totallyTimeSpent" value="40420000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -417,7 +418,7 @@
         <state relative-caret-position="2310">
           <caret line="110" column="28" lean-forward="false" selection-start-line="110" selection-start-column="28" selection-end-line="110" selection-end-column="28" />
           <folding>
-            <element signature="e#119#137#0#PHP" expanded="true" />
+            <element signature="e#138#156#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -467,7 +468,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#119#137#0#PHP" expanded="true" />
+            <element signature="e#138#156#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -509,7 +510,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#119#137#0#PHP" expanded="true" />
+            <element signature="e#138#156#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -658,10 +659,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="263">
-          <caret line="54" column="59" lean-forward="false" selection-start-line="54" selection-start-column="59" selection-end-line="54" selection-end-column="59" />
+        <state relative-caret-position="0">
+          <caret line="0" column="18" lean-forward="false" selection-start-line="0" selection-start-column="18" selection-end-line="0" selection-end-column="18" />
           <folding>
-            <element signature="e#119#137#0#PHP" expanded="true" />
+            <element signature="e#138#156#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
