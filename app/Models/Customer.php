@@ -172,7 +172,7 @@ class Customer
             //update balance
             $newBalance = $account->getBalance() - $amount;
             $account->setBalance($newBalance);
-            Console::writeLine('You did withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' to account ' . $account->getId());
+            Console::writeLine('You did withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' from account ' . $account->getId());
             Log::info('Customer ' . $this->getId() . ' withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' from account ' . $account->getId());
         }
     }
