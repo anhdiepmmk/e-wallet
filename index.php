@@ -43,18 +43,172 @@ class Program
         Console::writeLine('3. Withdraw your money');
         Console::writeLine('4. Deposit your money');
         Console::writeLine('5. Add new an account');
-        Console::writeLine('6. Exit');
+        Console::writeLine('6. Change Primary account');
+        Console::writeLine('7. Logout');
         Console::writeLine('------------------------------');
     }
 
-    function printCurrencies()
-    {
-        $currencies = Currency::getCurrencies();
 
-        for ($i = 0; $i < count($currencies); ++$i) {
-            $currency = $currencies[$i];
-            Console::writeLine(($i + 1) . ' - ' . $currency->getCode() . ' - ' . $currency->getCountryName());
-        }
+    function afterLogin()
+    {
+        Console::loop(function (){
+            $this->printMenuCustomer();
+            $choice = Console::readLine();
+
+            switch ($choice) {
+                case Constant::MENU_CUSTOMER_GET_LIST_ACCOUNT:
+                    $this->customer->printAccounts();
+                    break;
+                case Constant::MENU_CUSTOMER_TRANSFER:
+                    $this->transfer();
+                    break;
+                case Constant::MENU_CUSTOMER_WITHDRAW:
+                    $this->withdraw();
+                    break;
+                case Constant::MENU_CUSTOMER_DEPOSIT:
+                    $this->deposit();
+                    break;
+                case Constant::MENU_CUSTOMER_ADD_ACCOUNT:
+                    $this->addAccount();
+                    break;
+                case Constant::MENU_CUSTOMER_CHANGE_PRIMARY_ACCOUNT:
+                    $this->changePrimaryAccount();
+                    break;
+                case Constant::MENU_CUSTOMER_LOGOUT:
+                    $this->customer = null;//clear session
+                    Console::writeLine('Goodbye !!!');
+                    return true;
+                default:
+                    Console::writeLine('Please enter correct choice: ');
+                    break;
+            }
+            return false;
+        });
+    }
+
+    function transfer()
+    {
+    }
+
+    function withdraw()
+    {
+    }
+
+    function deposit()
+    {
+    }
+
+    /**
+     * Add new an account
+     */
+    function addAccount()
+    {
+        Console::writeLine('Do you want create an new account ?');
+
+        //Get name from keyboard
+        $name = Console::loop(function () {
+            Console::writeLine('Enter your account name: ');
+            $name = trim(Console::readLine());
+
+            //Validate name
+            if (strlen($name) <= 0) {
+                Console::writeLine('Notice: your account name cannot be empty');
+                return false;
+            }
+            return $name;
+        });
+
+        //Get currency
+        Currency::printCurrencies();
+        $currency = Console::loop(function () {
+            Console::writeLine('Enter your currency code (reference currencies list above): ');
+            $code = trim(Console::readLine());
+
+            //Validate code
+            if (empty($code)) {
+                Console::writeLine('Notice: your currency code cannot be empty');
+                return false;
+            } elseif (strlen($code) != 3) {
+                Console::writeLine('Notice: your currency code must be length 3 character');
+                return false;
+            }
+
+            //find currency object by input code
+            $currency = Currency::getCurrencyByCode(strtoupper($code));
+            if (!$currency) {
+                Console::writeLine('Notice: your currency code do not match any code in currencies list above');
+            }
+            return $currency;
+        });
+
+        //Console::writeLine('Your currency info: ' . $currency->getCode() . ' - ' . $currency->getCountryName());
+
+        //create an account with input above
+        $account = new Account();
+        $account->setId(\Models\SequenceAccount::getSequence());
+        $account->setBalance(0.0);
+        $account->setCurrency($currency);
+        $account->setName($name);
+
+        //store to array list
+        $this->customer->addAccounts($account);
+
+        Console::writeLine('Your account created, here is info: ' . $account);
+    }
+
+
+    /**
+     * Freeze Account
+     */
+    function freezeAccount(){
+    }
+
+    /**
+     * Change Primary Account
+     * Note: except virtual account
+     */
+    function changePrimaryAccount()
+    {
+        Console::writeLine('Do you want change primary account ?');
+        $this->customer->printAccounts();
+
+
+        Console::loop(function () {
+            Console::writeLine('Enter your account id you want to set primary (or you can type --back to back to previous screen): ');
+            $id = trim(Console::readLine());
+
+            if (!empty($id)) {
+                //with input --back we support user back to previous screen
+                if ($id == '--back')
+                    return true;
+
+                //use regex to check data type is integer
+                if (preg_match('/^[-+]?\d+$/', $id)) {
+                    //find account by id
+                    $account = $this->customer->getAccountById($id);
+                    //check account exist
+                    if ($account) {
+                        $defaultAccount = $this->customer->getDefaultAccount();
+                        if ($defaultAccount->getId() == $account->getId()) {
+                            Console::writeLine('Notice: this account is identical to the old primary account');
+                        } else if ($account->getCurrency()->isVirtualCurrency()) {
+                            Console::writeLine('Notice: virtual account cannot set to primary account');
+                        } else {
+                            $this->customer->setDefaultAccount($account);
+                            Console::writeLine('Now account ' . $id . ' is primary account');
+                            return true;
+                        }
+                    } else {
+                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
+                    }
+                } else {
+                    Console::writeLine('Notice: your account id must be integer number');
+                }
+            } else {
+                Console::writeLine('Notice: your account id cannot be empty');
+            }
+            return false;
+        });
     }
 
     /**
@@ -75,8 +229,7 @@ class Program
                     break;
                 } else {
                     //create new customer
-                    $customer = new Customer();
-                    $customer->setId($id);
+                    $customer = Customer::getDefault($id);
 
                     //Check customer id is unique
                     if ($customer->isUnique($this->customers)) {
@@ -102,7 +255,7 @@ class Program
 
         //if user created we are going to next screen
         if (!$flag) {
-            //do some things
+            $this->afterLogin();
         }
 
     }
@@ -123,12 +276,12 @@ class Program
                 if ($id == '--back') {
                     break;
                 } else {
-                    $customer = new  Customer(false);
+                    $customer = new Customer();
                     $result = $customer->login($id, $this->customers);
 
                     //if return data type is Customer ~> Login success
                     if ($result instanceof Customer) {
-                        $this->customer = $customer;
+                        $this->customer = $result;
                         Console::writeLine('Welcome back ' . $result->getId());
 
                         $flag = false;
@@ -142,7 +295,7 @@ class Program
         } while ($flag);
 
         if (!$flag) {
-            //do some things
+            $this->afterLogin();
         }
 
     }
@@ -160,7 +313,7 @@ class Program
      */
     public function main()
     {
-        do {
+        Console::loop(function (){
             //print to screen menu choice and wait input from user
             $this->printMenuMain();
             $choice = Console::readLine();
@@ -179,7 +332,8 @@ class Program
                     Console::writeLine('Please enter correct choice:');
                     break;
             }
-        } while (true);
+            return false;
+        });
     }
 }
 

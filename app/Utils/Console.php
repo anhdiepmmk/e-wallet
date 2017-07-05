@@ -12,6 +12,19 @@ namespace Utils;
 class Console
 {
     /**
+     * Auto loop callback if return false
+     * @param $callback
+     * @return bool or callback data
+     */
+    public static function loop($callback)
+    {
+        do {
+            $done = $callback();
+        } while (is_bool($done) && !$done);
+        return $done;
+    }
+
+    /**
      * Get input from keyboard
      * @return string
      */

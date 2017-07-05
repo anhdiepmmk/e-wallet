@@ -9,22 +9,71 @@
 namespace Models;
 
 
+use Utils\Console;
+
 class Customer
 {
     private $id;
     private $defaultAccount;
     private $accounts = array();
 
-    function __construct($wantInit = true)
+    /**
+     * Get default Customer
+     * @param $id
+     * @return Customer
+     */
+    public static function getDefault($id)
     {
-        if($wantInit){
-            $virtualAccount = new Account();
-            $usdAccount = new Account();
+        $customer = new Customer();
 
-            //add two account to this array
-            $accounts[]  = $virtualAccount;
-            $accounts[]  = $usdAccount;
+        //init virtual account
+        $virtualAccount = new Account();
+        $virtualAccount->setId(SequenceAccount::getSequence());
+        $virtualAccount->setName('Credits');
+        $virtualAccount->setCurrency(Currency::getVirtualCurrency());
+        $virtualAccount->setBalance(0.0);
+
+        //init usd account
+        $usdAccount = new Account();
+        $usdAccount->setId(SequenceAccount::getSequence());
+        $usdAccount->setName('United States Dollar');
+        $usdAccount->setCurrency(Currency::getCurrencyByCode('USD'));
+        $usdAccount->setBalance(0.0);
+
+        //binding data to customer object
+        $customer->setId($id);
+        $customer->addAccounts($virtualAccount);
+        $customer->addAccounts($usdAccount);
+        $customer->setDefaultAccount($usdAccount);
+
+        return $customer;
+    }
+
+    /**
+     * Print all account to screen
+     */
+    public function printAccounts()
+    {
+        Console::writeLine('You have ' . count($this->accounts) . ' account: ');
+        for ($i = 0; $i < count($this->accounts); ++$i) {
+            $account = $this->accounts[$i];
+            Console::write($account->getId() .
+                ' - ' . $account->getName() .
+                ' - ' . $account->getBalance() .
+                ' ' . $account->getCurrency()->getCode());
+
+            //if account is default account will break line and print text notice for user it is primary account
+            if ($account->getId() == $this->defaultAccount->getId()) {
+                Console::writeLine(' (Primary account)');
+            } else {
+                Console::writeLine('');
+            }
         }
+    }
+
+    public function transfer($fromAccount, $toAccount, $amount)
+    {
+        //
     }
 
     /**
@@ -33,8 +82,9 @@ class Customer
      * @param array $customers
      * @return bool
      */
-    public function login($id, array $customers){
-        if(count($customers) > 0){
+    public function login($id, array $customers)
+    {
+        if (count($customers) > 0) {
             for ($i = 0; $i < count($customers); ++$i) {
                 $item = $customers[$i];
                 if ($id == $item->id) {
@@ -64,6 +114,7 @@ class Customer
 
         return true;
     }
+
 
     /**
      * @return mixed
@@ -105,12 +156,31 @@ class Customer
         return $this->accounts;
     }
 
+
     /**
-     * @param array $accounts
+     * Find account by id
+     * @param $id
+     * @return bool
      */
-    public function setAccounts($accounts)
+    public function getAccountById($id)
     {
-        $this->accounts = $accounts;
+        $accounts = $this->accounts;
+        for ($i = 0; $i < count($this->accounts); ++$i) {
+            $account = $this->accounts[$i];
+            if ($id == $account->getId()) {
+                return $account;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Add account to array
+     * @param array $account
+     */
+    public function addAccounts($account)
+    {
+        $this->accounts[] = $account;
     }
 
 

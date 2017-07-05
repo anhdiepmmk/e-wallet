@@ -12,9 +12,10 @@ namespace Models;
 class Account
 {
     private $id;
+    private $name;
     private $currency;
-    private $amount;
-
+    private $balance;
+    private $isFreeze;
 
     /**
      * @return mixed
@@ -35,6 +36,23 @@ class Account
     /**
      * @return mixed
      */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+
+    /**
+     * @return mixed
+     */
     public function getCurrency()
     {
         return $this->currency;
@@ -51,16 +69,42 @@ class Account
     /**
      * @return mixed
      */
-    public function getAmount()
+    public function getBalance()
     {
-        return $this->amount;
+        return $this->balance;
     }
 
     /**
-     * @param mixed $amount
+     * @param mixed $balance
      */
-    public function setAmount($amount)
+    public function setBalance($balance)
     {
-        $this->amount = $amount;
+        $this->balance = $balance;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getIsFreeze()
+    {
+        return $this->isFreeze;
+    }
+
+    /**
+     * @param mixed $isFreeze
+     */
+    public function setIsFreeze($isFreeze)
+    {
+        $this->isFreeze = $isFreeze;
+    }
+
+
+    function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return 'id = ' . $this->id . PHP_EOL .
+            'currency (' . $this->currency. ')' . PHP_EOL .
+            'balance = ' . $this->balance;
+    }
+
 }
