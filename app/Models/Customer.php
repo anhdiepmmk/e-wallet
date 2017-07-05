@@ -15,16 +15,39 @@ class Customer
     private $defaultAccount;
     private $accounts = array();
 
-    function __construct($wantInit = true)
-    {
-        if($wantInit){
-            $virtualAccount = new Account();
-            $usdAccount = new Account();
+    /**
+     * Get default Customer
+     * @param $id
+     * @return Customer
+     */
+    public static function getDefault($id){
+        $customer = new Customer();
 
-            //add two account to this array
-            $accounts[]  = $virtualAccount;
-            $accounts[]  = $usdAccount;
-        }
+        //init virtual account
+        $virtualAccount = new Account();
+        $virtualAccount->setId(SequenceAccount::getSequence());
+        $virtualAccount->setName('Credits');
+        $virtualAccount->setCurrency(Constant::DEFAULT_CURRENCY);
+        $virtualAccount->setBalance(0.0);
+
+        //init usd account
+        $usdAccount = new Account();
+        $usdAccount->setId(SequenceAccount::getSequence());
+        $usdAccount->setName('United States Dollar');
+        $usdAccount->setCurrency('USD');
+        $usdAccount->setBalance(0.0);
+
+        //binding data to customer object
+        $customer->setId($id);
+        $customer->addAccounts($virtualAccount);
+        $customer->addAccounts($usdAccount);
+        $customer->setDefaultAccount($usdAccount);
+
+        return $customer;
+    }
+
+    public function printAccounts(){
+
     }
 
     /**
@@ -33,8 +56,9 @@ class Customer
      * @param array $customers
      * @return bool
      */
-    public function login($id, array $customers){
-        if(count($customers) > 0){
+    public function login($id, array $customers)
+    {
+        if (count($customers) > 0) {
             for ($i = 0; $i < count($customers); ++$i) {
                 $item = $customers[$i];
                 if ($id == $item->id) {
@@ -106,11 +130,12 @@ class Customer
     }
 
     /**
-     * @param array $accounts
+     * Add account to array
+     * @param array $account
      */
-    public function setAccounts($accounts)
+    public function addAccounts($account)
     {
-        $this->accounts = $accounts;
+        $this->accounts[] = $account;
     }
 
 

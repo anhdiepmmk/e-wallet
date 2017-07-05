@@ -12,9 +12,9 @@ namespace Models;
 class Account
 {
     private $id;
+    private $name;
     private $currency;
-    private $amount;
-
+    private $balance;
 
     /**
      * @return mixed
@@ -35,6 +35,24 @@ class Account
     /**
      * @return mixed
      */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+
+
+    /**
+     * @return mixed
+     */
     public function getCurrency()
     {
         return $this->currency;
@@ -51,16 +69,19 @@ class Account
     /**
      * @return mixed
      */
-    public function getAmount()
+    public function getBalance()
     {
-        return $this->amount;
+        return $this->balance;
     }
 
     /**
-     * @param mixed $amount
+     * @param mixed $balance
      */
-    public function setAmount($amount)
+    public function setBalance($balance)
     {
-        $this->amount = $amount;
+        $this->balance = $balance;
     }
+
+
+
 }

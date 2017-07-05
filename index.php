@@ -9,6 +9,7 @@ include '__autoload.php';
 use Utils\Console;
 use Utils\Log;
 use Models\Account;
+use Models\Currency;
 use Models\Constant;
 use Models\Customer;
 
@@ -39,10 +40,42 @@ class Program
         Console::writeLine($this->customer->getId() . ' welcome to E-Wallet System');
         Console::writeLine('1. Get list account');
         Console::writeLine('2. Transfer your money');
-        Console::writeLine('2. Widraw your money');
-        Console::writeLine('2. Deposit your money');
-        Console::writeLine('3. Exit');
+        Console::writeLine('3. Withdraw your money');
+        Console::writeLine('4. Deposit your money');
+        Console::writeLine('5. Add new an account');
+        Console::writeLine('6. Exit');
         Console::writeLine('------------------------------');
+    }
+
+    /**
+     * Print all currency to screen
+     */
+    function printCurrencies()
+    {
+        $currencies = Currency::getCurrencies();
+
+        for ($i = 0; $i < count($currencies); ++$i) {
+            $currency = $currencies[$i];
+            Console::writeLine(($i + 1) . ' - ' . $currency->getCode() . ' - ' . $currency->getCountryName());
+        }
+    }
+
+    function afterLogin(){
+        do{
+            $this->printMenuCustomer();
+            $choice = Console::readLine();
+
+            switch ($choice){
+                case 1:
+                    break;
+                case 1:
+                    break;
+                case 1:
+                    break;
+                case 1:
+                    break;
+            }
+        }while(true);
     }
 
     /**
@@ -50,36 +83,47 @@ class Program
      */
     function register()
     {
-        Console::writeLine('Hello new user let choose your unique id: ');
+        Console::writeLine('Hello new user let choose your unique id (or you can type --back to back to previous screen): ');
 
         //when all things are correct flag will be false value to end this loop
         $flag = true;
         do {
             $id = trim(Console::readLine());
 
+            //Just process when input from user is correct. Else notice to they re-enter
             if (strlen($id) > 0) {
-                //create new customer
-                $customer = new \Models\Customer();
-                $customer->setId($id);
-
-                //Check customer id is unique
-                if ($customer->isUnique($this->customers)) {
-                    //store new customer to array
-                    $this->customers[] = $customer;
-                    $this->customer = $customer;
-
-                    //write this event to logs folder
-                    Log::info('Create new customer with id ' . $customer->getId());
-
-                    //break this loop
-                    $flag = false;
+                if ($id == '--back') {
+                    break;
                 } else {
-                    Console::writeLine("Your id already existing, please choose new unique id: ");
+                    //create new customer
+                    $customer = Customer::getDefault($id);
+
+                    //Check customer id is unique
+                    if ($customer->isUnique($this->customers)) {
+                        //store new customer to array
+                        $this->customers[] = $customer;
+                        $this->customer = $customer;
+
+                        //write this event to logs folder
+                        Log::info('Create new customer with id ' . $customer->getId());
+
+                        //break this loop
+                        $flag = false;
+                    } else {
+                        Console::writeLine("Your id already existing, please choose new unique id (or you can type --back to back to previous screen): ");
+                    }
                 }
+
             } else {
-                Console::writeLine("Id can not be empty, please choose new unique id: ");
+                Console::writeLine("Id can not be empty, please choose new unique id (or you can type --back to back to previous screen): ");
             }
         } while ($flag);
+
+
+        //if user created we are going to next screen
+        if (!$flag) {
+            $this->afterLogin();
+        }
 
     }
 
@@ -88,16 +132,39 @@ class Program
      */
     function login()
     {
-        Console::writeLine('Welcome back guest, tell me your id: ');
-        $id = trim(Console::readLine());
+        Console::writeLine('Welcome back guest, tell me your id (or you can type --back to back to previous screen): ');
 
-        $customer = new  Customer(false);
-        $result = $customer->login($id,$this->customers);
+        $flag = true;
+        do {
+            $id = trim(Console::readLine());
 
-        if($result instanceof Customer){
+            //Just process when input from user is correct. Else notice to they re-enter
+            if (strlen($id) > 0) {
+                if ($id == '--back') {
+                    break;
+                } else {
+                    $customer = new Customer();
+                    $result = $customer->login($id, $this->customers);
 
-        }else{
+                    //if return data type is Customer ~> Login success
+                    if ($result instanceof Customer) {
+                        $this->customer = $customer;
+                        Console::writeLine('Welcome back ' . $result->getId());
+
+                        $flag = false;
+                    } else {
+                        Console::writeLine('Login unsuccessfully, may be incorrect id, please enter your id again (or you can type --back to back to previous screen): ');
+                    }
+                }
+            } else {
+                Console::writeLine("Id can not be empty, please enter your id (or you can type --back to back to previous screen): ");
+            }
+        } while ($flag);
+
+        if (!$flag) {
+            $this->afterLogin();
         }
+
     }
 
     /**
@@ -108,6 +175,9 @@ class Program
         exit('Thanks for your visit. See you later');
     }
 
+    /**
+     * All code write in here will run first
+     */
     public function main()
     {
         do {
@@ -126,18 +196,18 @@ class Program
                     $this->quit();
                     break;
                 default:
-                    Console::writeLine('Please enter correct choice');
+                    Console::writeLine('Please enter correct choice:');
                     break;
             }
         } while (true);
-
-        $account = new Account();
     }
 }
 
 //invoke main function, main function is where first call
 $program = new Program();
 $program->main();
+
+
 
 
 

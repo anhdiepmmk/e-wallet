@@ -15,4 +15,6 @@ class Constant
     const MENU_MAIN_RETURNING_CUSTOMER = 2;
     const MENU_MAIN_EXIT = 3;
 
+    const DEFAULT_CURRENCY = 'CREDITS';
+
 }
