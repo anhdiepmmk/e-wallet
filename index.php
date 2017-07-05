@@ -64,6 +64,7 @@ class Program
             switch ($choice) {
                 case Constant::MENU_CUSTOMER_GET_LIST_ACCOUNT:
                     $this->customer->printAccounts();
+                    Log::info('Get list accounts and balance of the customer ' . $this->customer->getId());
                     break;
                 case Constant::MENU_CUSTOMER_TRANSFER:
                     $this->transfer();
@@ -84,6 +85,7 @@ class Program
                     $this->freezeAccount();
                     break;
                 case Constant::MENU_CUSTOMER_LOGOUT:
+                    Log::info('Customer ' . $this->customer->getId() . ' logout');
                     $this->customer = null;//clear session
                     Console::writeLine('Goodbye !!!');
                     return true;
@@ -95,8 +97,46 @@ class Program
         });
     }
 
+    /**
+     * Transfer money
+     */
     function transfer()
     {
+        Console::writeLine('Do you want transfer money ?');
+        $this->customer->printAccounts();
+
+        //Choose transfer account
+        Console::writeLine('Select account transfer: ');
+        $accountTransfer = $this->customer->chooseAccount();
+
+        if (!($accountTransfer instanceof Account))
+            return;
+
+        //Choose receiving account
+        Console::writeLine('Select the receive account: ');
+        $accountReceive = $this->customer->chooseAccount();
+
+        if (!($accountReceive instanceof Account))
+            return;
+
+        //Cannot transfer money between freeze account
+        if ($accountTransfer->isFreeze() || $accountReceive->isFreeze()) {
+            Console::writeLine('One of the accounts has been frozen');
+        } else {
+
+            //Cannot transfer money same one account
+            if ($accountTransfer->getId() == $accountReceive->getId()) {
+                Console::writeLine('You do not transfer money between same one account');
+            } else {
+                //input amount user want transfer
+                Console::writeLine('Let enter your amount you want send: ');
+                $amount = $this->customer->inputAmount($accountTransfer);
+
+                if (is_double($amount)) {
+                    $this->customer->transfer($accountTransfer, $accountReceive, $amount);
+                }
+            }
+        }
     }
 
     /**
@@ -215,6 +255,8 @@ class Program
         $this->customer->addAccounts($account);
 
         Console::writeLine('Your account created, here is info: ' . $account);
+
+        Log::info('Add new account ' . $account->getId() . ' for customer ' . $this->customer->getId());
     }
 
 
@@ -324,7 +366,7 @@ class Program
                     if ($result instanceof Customer) {
                         $this->customer = $result;
                         Console::writeLine('Welcome back ' . $result->getId());
-
+                        Log::info('Customer ' . $customer->getId() . ' login');
                         $flag = false;
                     } else {
                         Console::writeLine('Login unsuccessfully, may be incorrect id, please enter your id again (or you can type --back to back to previous screen): ');

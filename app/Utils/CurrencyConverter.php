@@ -50,7 +50,7 @@ class CurrencyConverter
                 case 200:  # OK
                     preg_match('/<span class=\'uccResultAmount\'>(.+?)<\/span>/m', $result, $matches);
                     if (count($matches) > 1) {
-                        return $matches[1];
+                        return (double)$matches[1];
                     }
                     break;
                 default:

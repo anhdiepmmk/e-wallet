@@ -10,6 +10,8 @@ namespace Models;
 
 
 use Utils\Console;
+use Utils\CurrencyConverter;
+use Utils\Log;
 
 class Customer
 {
@@ -165,11 +167,13 @@ class Customer
     {
         if ($amount > $account->getBalance()) {
             Console::writeLine('Notice: your account not enough money');
+            Log::info('Customer ' . $this->getId() . ' withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' from account ' . $account->getId() . ' but not enough money');
         } else {
             //update balance
             $newBalance = $account->getBalance() - $amount;
             $account->setBalance($newBalance);
             Console::writeLine('You did withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' to account ' . $account->getId());
+            Log::info('Customer ' . $this->getId() . ' withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' from account ' . $account->getId());
         }
     }
 
@@ -184,6 +188,7 @@ class Customer
         $newBalance = $account->getBalance() + $amount;
         $account->setBalance($newBalance);
         Console::writeLine('You did deposit ' . $amount . ' ' . $account->getCurrency()->getCode() . ' to account ' . $account->getId());
+        Log::info('Customer ' . $this->getId() . ' deposit ' . $amount . ' ' . $account->getCurrency()->getCode() . ' to account ' . $account->getId());
     }
 
     /**
@@ -194,9 +199,11 @@ class Customer
     {
         if ($account->getCurrency()->isVirtualCurrency()) {
             Console::writeLine('Notice: cannot freeze this account');
+            Log::info('Customer freeze virtual account but not permit');
         } else {
             $account->setFreeze(!$account->isFreeze());//reverse, if account is freeze ~> unfreeze or else
             Console::writeLine('Now account ' . $account->getId() . ' is ' . ($account->isFreeze() ? 'freeze' : 'unfreeze'));
+            Log::info(($account->isFreeze() ? 'Freeze ' : 'Unfreeze ') . $account->getId() . ' of the customer ' . $this->getId());
         }
     }
 
@@ -215,12 +222,60 @@ class Customer
         } else {
             $this->setDefaultAccount($account);
             Console::writeLine('Now account ' . $account->getId() . ' is primary account');
+            Log::info('Set account ' . $account->getId() . ' to be primary account for customer ' . $this->getId());
         }
     }
 
+    /**
+     * Transfer money
+     * @param $fromAccount
+     * @param $toAccount
+     * @param $amount
+     */
     public function transfer($fromAccount, $toAccount, $amount)
     {
-        //
+        if ($amount > $fromAccount->getBalance()) {
+            Console::writeLine('Your sender account not enough money');
+            Log::info('Customer ' . $this->getId() . ' transfer ' . $amount . ' ' . $fromAccount->getCurrency()->getCode() . ' from account ' . $fromAccount->getId() . ' to another account but not enough money');
+        } else {
+            //1 credit = 1 usd
+            $fromCurrency = ($fromAccount->getCurrency()->isVirtualCurrency()) ? 'USD' : $fromAccount->getCurrency()->getCode();
+            $toCurrency = ($toAccount->getCurrency()->isVirtualCurrency()) ? 'USD' : $toAccount->getCurrency()->getCode();
+
+
+            //if same currency code
+            if($fromCurrency == $toCurrency){
+                // - money
+                $newFromBalance = $fromAccount->getBalance() - $amount;
+                $fromAccount->setBalance($newFromBalance);
+
+                // + money
+                $newToBalance = $toAccount->getBalance() + $amount;
+                $toAccount->setBalance($newToBalance);
+
+                Log::info('Customer ' . $this->getId() . ' transfer ' . $amount . ' ' . $fromAccount->getCurrency()->getCode() . ' from account ' . $fromAccount->getId() . ' to account ' . $toAccount->getId() . ' successfully');
+                Console::writeLine('You have successfully transferred money');
+            }else{
+                Console::writeLine('Connect to world bank to get currency rate...');
+                $convertAmount = CurrencyConverter::convert($amount, $fromCurrency, $toCurrency);
+
+                if($convertAmount > -1){
+                    // - money
+                    $newFromBalance = $fromAccount->getBalance() - $amount;
+                    $fromAccount->setBalance($newFromBalance);
+
+                    // + money
+                    $newToBalance = $toAccount->getBalance() + (double)$convertAmount;
+                    $toAccount->setBalance($newToBalance);
+
+                    Log::info('Customer ' . $this->getId() . ' transfer ' . $amount . ' ' . $fromAccount->getCurrency()->getCode() . ' from account ' . $fromAccount->getId() . ' to account ' . $toAccount->getId() . ' successfully');
+                    Console::writeLine('You have successfully transferred money');
+                }else{
+                    Log::info('Customer ' . $this->getId() . ' transfer ' . $amount . ' ' . $fromAccount->getCurrency()->getCode() . ' from account ' . $fromAccount->getId() . ' to account ' . $toAccount->getId() . ' error');
+                    Console::writeLine('Cannot connect to world bank please try again late.');
+                }
+            }
+        }
     }
 
     /**
@@ -229,8 +284,7 @@ class Customer
      * @param array $customers
      * @return bool
      */
-    public
-    function login($id, array $customers)
+    public function login($id, array $customers)
     {
         if (count($customers) > 0) {
             for ($i = 0; $i < count($customers); ++$i) {
@@ -248,8 +302,7 @@ class Customer
      * @param array $customers
      * @return bool
      */
-    public
-    function isUnique(array $customers)
+    public function isUnique(array $customers)
     {
         //if $customers bigger than 0 ~> need check. else just return true
         if (count($customers) > 0) {
@@ -300,8 +353,7 @@ class Customer
     /**
      * @return array
      */
-    public
-    function getAccounts()
+    public function getAccounts()
     {
         return $this->accounts;
     }
@@ -312,8 +364,7 @@ class Customer
      * @param $id
      * @return bool
      */
-    public
-    function getAccountById($id)
+    public function getAccountById($id)
     {
         $accounts = $this->accounts;
         for ($i = 0; $i < count($this->accounts); ++$i) {
