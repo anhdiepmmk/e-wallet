@@ -16,10 +16,15 @@ class Console
      * @param $callback
      * @return bool or callback data
      */
-    public static function loop($callback)
+    public static function loop($callback, $val = null)
     {
         do {
-            $done = $callback();
+            //if(isset($val)){
+                $done = $callback($val);
+            //}else{
+                //$done = $callback();
+            //}
+
         } while (is_bool($done) && !$done);
         return $done;
     }

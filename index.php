@@ -105,6 +105,74 @@ class Program
 
     function deposit()
     {
+        Console::writeLine('Do you want deposit money ?');
+        $this->customer->printAccounts();
+
+        // Get account which user want to deposit
+        $account = Console::loop(function () {
+            Console::writeLine('Enter your account id you want to deposit (or you can type --back to back to previous screen): ');
+            $id = trim(Console::readLine());
+
+            if (!empty($id)) {
+                //with input --back we support user back to previous screen
+                if ($id == '--back')
+                    return true;
+
+                //use regex to check data type is integer
+                if (preg_match('/^[-+]?\d+$/', $id)) {
+                    //find account by id
+                    $account = $this->customer->getAccountById($id);
+                    //check account exist
+                    if ($account) {
+                        return $account;
+                    } else {
+                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
+                    }
+                } else {
+                    Console::writeLine('Notice: your account id must be integer number');
+                }
+            } else {
+                Console::writeLine('Notice: your account id cannot be empty');
+            }
+            return false;
+        });
+
+        if ($account instanceof Account) {
+            //Get amount from user
+            $amount = Console::loop(function ($account) {
+                //Get input from keyboard
+                Console::writeLine('Please enter the number of the ' . $account->getCurrency()->getCode() . ' you want to send: ');
+                $amount = trim(Console::readLine());
+
+                //validate
+                if (!empty($amount)) {
+                    //with input --back we support user back to previous screen
+                    if ($amount == '--back')
+                        return true;
+
+                    if (is_numeric($amount)) {
+                        $amount = (double)$amount;
+                        if ($account > 0) {
+                            return $amount;
+                        } else {
+                            Console::writeLine('Notice: your amount must be larger than 0');
+                        }
+                    } else {
+                        Console::writeLine('Notice: your amount must be numeric');
+                    }
+
+                } else {
+                    Console::writeLine('Notice: your amount cannot be empty');
+                }
+            }, $account);
+
+            //Do deposit to account
+            if (is_double($amount)) {
+                $newBalance = (double)$account->getBalance() + $amount;
+                $account->setBalance($newBalance);
+                Console::writeLine('You did deposit ' . $amount . ' USD to account ' . $account->getId());
+            }
+        }
     }
 
     /**
@@ -171,7 +239,7 @@ class Program
      */
     function freezeAccount()
     {
-        Console::writeLine('Do you want change freeze/unfreeze account ?');
+        Console::writeLine('Do you want freeze/unfreeze account ?');
         $this->customer->printAccounts();
 
         Console::loop(function () {
@@ -179,6 +247,10 @@ class Program
             $id = trim(Console::readLine());
 
             if (!empty($id)) {
+                //with input --back we support user back to previous screen
+                if ($id == '--back')
+                    return true;
+
                 //use regex to check data type is integer
                 if (preg_match('/^[-+]?\d+$/', $id)) {
                     //find account by id
