@@ -51,8 +51,7 @@ class Program
 
     function afterLogin()
     {
-        $flag = true;
-        do {
+        Console::loop(function (){
             $this->printMenuCustomer();
             $choice = Console::readLine();
 
@@ -76,15 +75,15 @@ class Program
                     $this->changePrimaryAccount();
                     break;
                 case Constant::MENU_CUSTOMER_LOGOUT:
-                    $flag = false;//end this loop
                     $this->customer = null;//clear session
                     Console::writeLine('Goodbye !!!');
-                    break;
+                    return true;
                 default:
                     Console::writeLine('Please enter correct choice: ');
                     break;
             }
-        } while ($flag);
+            return false;
+        });
     }
 
     function transfer()
@@ -155,6 +154,13 @@ class Program
         $this->customer->addAccounts($account);
 
         Console::writeLine('Your account created, here is info: ' . $account);
+    }
+
+
+    /**
+     * Freeze Account
+     */
+    function freezeAccount(){
     }
 
     /**
@@ -307,7 +313,7 @@ class Program
      */
     public function main()
     {
-        do {
+        Console::loop(function (){
             //print to screen menu choice and wait input from user
             $this->printMenuMain();
             $choice = Console::readLine();
@@ -326,7 +332,8 @@ class Program
                     Console::writeLine('Please enter correct choice:');
                     break;
             }
-        } while (true);
+            return false;
+        });
     }
 }
 

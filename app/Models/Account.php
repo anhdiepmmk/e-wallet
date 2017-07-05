@@ -15,6 +15,7 @@ class Account
     private $name;
     private $currency;
     private $balance;
+    private $isFreeze;
 
     /**
      * @return mixed
@@ -80,6 +81,23 @@ class Account
     {
         $this->balance = $balance;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getIsFreeze()
+    {
+        return $this->isFreeze;
+    }
+
+    /**
+     * @param mixed $isFreeze
+     */
+    public function setIsFreeze($isFreeze)
+    {
+        $this->isFreeze = $isFreeze;
+    }
+
 
     function __toString()
     {
