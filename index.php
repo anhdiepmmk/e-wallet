@@ -44,14 +44,15 @@ class Program
         Console::writeLine('4. Deposit your money');
         Console::writeLine('5. Add new an account');
         Console::writeLine('6. Change Primary account');
-        Console::writeLine('7. Logout');
+        Console::writeLine('7. Freeze/UnFreeze account');
+        Console::writeLine('8. Logout');
         Console::writeLine('------------------------------');
     }
 
 
     function afterLogin()
     {
-        Console::loop(function (){
+        Console::loop(function () {
             $this->printMenuCustomer();
             $choice = Console::readLine();
 
@@ -73,6 +74,9 @@ class Program
                     break;
                 case Constant::MENU_CUSTOMER_CHANGE_PRIMARY_ACCOUNT:
                     $this->changePrimaryAccount();
+                    break;
+                case Constant::MENU_CUSTOMER_FREEZE_ACCOUNT:
+                    $this->freezeAccount();
                     break;
                 case Constant::MENU_CUSTOMER_LOGOUT:
                     $this->customer = null;//clear session
@@ -158,9 +162,46 @@ class Program
 
 
     /**
-     * Freeze Account
+     * Freeze/UnFreeze Account
      */
-    function freezeAccount(){
+    function freezeAccount()
+    {
+        Console::writeLine('Do you want change freeze/unfreeze account ?');
+        $this->customer->printAccounts();
+
+        Console::loop(function () {
+            Console::writeLine('Enter your account id you want to freeze/unfreeze (or you can type --back to back to previous screen): ');
+            $id = trim(Console::readLine());
+
+            if (!empty($id)) {
+                //use regex to check data type is integer
+                if (preg_match('/^[-+]?\d+$/', $id)) {
+                    //find account by id
+                    $account = $this->customer->getAccountById($id);
+                    //check account exist
+                    if ($account) {
+                        if ($account->getCurrency()->isVirtualCurrency()) {
+                            Console::writeLine('Notice: cannot freeze this account');
+                        } else {
+                            $account->setFreeze(!$account->isFreeze());//reverse, if account is freeze ~> unfreeze or else
+                            Console::writeLine('Now account ' . $id . ' is ' . ($account->isFreeze() ? 'freeze' : 'unfreeze'));
+                            return true;
+                        }
+
+                    } else {
+                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
+                    }
+                } else {
+                    Console::writeLine('Notice: your account id must be integer number');
+                }
+            } else {
+                Console::writeLine('Notice: your account id cannot be empty');
+            }
+
+            return false;
+        });
+
+
     }
 
     /**
@@ -313,7 +354,7 @@ class Program
      */
     public function main()
     {
-        Console::loop(function (){
+        Console::loop(function () {
             //print to screen menu choice and wait input from user
             $this->printMenuMain();
             $choice = Console::readLine();

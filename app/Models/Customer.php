@@ -62,6 +62,10 @@ class Customer
                 ' - ' . $account->getBalance() .
                 ' ' . $account->getCurrency()->getCode());
 
+            if($account->isFreeze()){
+                Console::write(' (freeze)');
+            }
+
             //if account is default account will break line and print text notice for user it is primary account
             if ($account->getId() == $this->defaultAccount->getId()) {
                 Console::writeLine(' (Primary account)');

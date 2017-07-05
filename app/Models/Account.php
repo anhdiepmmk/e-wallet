@@ -85,7 +85,7 @@ class Account
     /**
      * @return mixed
      */
-    public function getIsFreeze()
+    public function isFreeze()
     {
         return $this->isFreeze;
     }
@@ -93,7 +93,7 @@ class Account
     /**
      * @param mixed $isFreeze
      */
-    public function setIsFreeze($isFreeze)
+    public function setFreeze($isFreeze)
     {
         $this->isFreeze = $isFreeze;
     }
