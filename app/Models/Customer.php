@@ -115,6 +115,7 @@ class Customer
         return true;
     }
 
+
     /**
      * @return mixed
      */
@@ -153,6 +154,24 @@ class Customer
     public function getAccounts()
     {
         return $this->accounts;
+    }
+
+
+    /**
+     * Find account by id
+     * @param $id
+     * @return bool
+     */
+    public function getAccountById($id)
+    {
+        $accounts = $this->accounts;
+        for ($i = 0; $i < count($this->accounts); ++$i) {
+            $account = $this->accounts[$i];
+            if ($id == $account->getId()) {
+                return $account;
+            }
+        }
+        return false;
     }
 
     /**

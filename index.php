@@ -71,6 +71,7 @@ class Program
                     break;
                 case Constant::MENU_CUSTOMER_ADD_ACCOUNT:
                     $this->addAccount();
+                    break;
                 case Constant::MENU_CUSTOMER_CHANGE_PRIMARY_ACCOUNT:
                     $this->changePrimaryAccount();
                     break;
@@ -156,8 +157,52 @@ class Program
         Console::writeLine('Your account created, here is info: ' . $account);
     }
 
+    /**
+     * Change Primary Account
+     * Note: except virtual account
+     */
     function changePrimaryAccount()
     {
+        Console::writeLine('Do you want change primary account ?');
+        $this->customer->printAccounts();
+
+
+        Console::loop(function () {
+            Console::writeLine('Enter your account id you want to set primary (or you can type --back to back to previous screen): ');
+            $id = trim(Console::readLine());
+
+            if (!empty($id)) {
+                //with input --back we support user back to previous screen
+                if ($id == '--back')
+                    return true;
+
+                //use regex to check data type is integer
+                if (preg_match('/^[-+]?\d+$/', $id)) {
+                    //find account by id
+                    $account = $this->customer->getAccountById($id);
+                    //check account exist
+                    if ($account) {
+                        $defaultAccount = $this->customer->getDefaultAccount();
+                        if ($defaultAccount->getId() == $account->getId()) {
+                            Console::writeLine('Notice: this account is identical to the old primary account');
+                        } else if ($account->getCurrency()->isVirtualCurrency()) {
+                            Console::writeLine('Notice: virtual account cannot set to primary account');
+                        } else {
+                            $this->customer->setDefaultAccount($account);
+                            Console::writeLine('Now account ' . $id . ' is primary account');
+                            return true;
+                        }
+                    } else {
+                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
+                    }
+                } else {
+                    Console::writeLine('Notice: your account id must be integer number');
+                }
+            } else {
+                Console::writeLine('Notice: your account id cannot be empty');
+            }
+            return false;
+        });
     }
 
     /**
