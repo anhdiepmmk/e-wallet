@@ -62,7 +62,7 @@ class Customer
                 ' - ' . $account->getBalance() .
                 ' ' . $account->getCurrency()->getCode());
 
-            if($account->isFreeze()){
+            if ($account->isFreeze()) {
                 Console::write(' (freeze)');
             }
 
@@ -72,6 +72,149 @@ class Customer
             } else {
                 Console::writeLine('');
             }
+        }
+    }
+
+    /**
+     * Help user choose account by account id from keyboard
+     * @return bool if user input --back command, account if user input correct amount
+     */
+    public function chooseAccount()
+    {
+        // Get account which user want to get
+        $account = Console::loop(function () {
+            Console::writeLine('Enter your account id you want to do this action (or you can type --back to back to previous screen): ');
+            $id = trim(Console::readLine());
+
+            if (!empty($id)) {
+                //with input --back we support user back to previous screen
+                if ($id == '--back')
+                    return true;
+
+                //use regex to check data type is integer
+                if (preg_match('/^[-+]?\d+$/', $id)) {
+
+                    //find account by id
+                    $account = $this->getAccountById($id);
+
+                    //check account exist
+                    if ($account) {
+                        return $account;
+                    } else {
+                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
+                    }
+                } else {
+                    Console::writeLine('Notice: your account id must be integer number');
+                }
+            } else {
+                Console::writeLine('Notice: your account id cannot be empty');
+            }
+            return false;
+        });
+
+        return $account;
+    }
+
+    /**
+     *
+     * Get Amount from keyboard
+     * @param $account
+     * @return bool if user input --back command, double if user input correct amount
+     */
+    public function inputAmount($account)
+    {
+        $amount = Console::loop(function ($account) {
+            //Get input from keyboard
+            Console::writeLine('Please enter the number of the ' . $account->getCurrency()->getCode() . ' : ');
+            $amount = trim(Console::readLine());
+
+            //validate
+            if (!empty($amount)) {
+                //with input --back we support user back to previous screen
+                if ($amount == '--back')
+                    return true;
+
+                //make sure it is number
+                if (is_numeric($amount)) {
+                    //make sure amount is double data type
+                    $amount = (double)$amount;
+
+                    //amount need larger than 0
+                    if ($amount > 0) {
+                        return $amount;
+                    } else {
+                        Console::writeLine('Notice: your amount must be larger than 0');
+                    }
+                } else {
+                    Console::writeLine('Notice: your amount must be numeric');
+                }
+            } else {
+                Console::writeLine('Notice: your amount cannot be empty');
+            }
+            return false;
+        }, $account);
+        return $amount;
+    }
+
+    /**
+     * WithDrawl amount from account
+     * @param $account
+     * @param $amount
+     */
+    public function withdraw($account, $amount)
+    {
+        if ($amount > $account->getBalance()) {
+            Console::writeLine('Notice: your account not enough money');
+        } else {
+            //update balance
+            $newBalance = $account->getBalance() - $amount;
+            $account->setBalance($newBalance);
+            Console::writeLine('You did withdraw ' . $amount . ' ' . $account->getCurrency()->getCode() . ' to account ' . $account->getId());
+        }
+    }
+
+    /**
+     * Deposit amount to account
+     * @param $account
+     * @param $amount
+     */
+    public function deposit($account, $amount)
+    {
+        //update balance
+        $newBalance = $account->getBalance() + $amount;
+        $account->setBalance($newBalance);
+        Console::writeLine('You did deposit ' . $amount . ' ' . $account->getCurrency()->getCode() . ' to account ' . $account->getId());
+    }
+
+    /**
+     * Freeze or unfreeze account
+     * @param $account
+     */
+    public function freezeOrUnFreeze($account)
+    {
+        if ($account->getCurrency()->isVirtualCurrency()) {
+            Console::writeLine('Notice: cannot freeze this account');
+        } else {
+            $account->setFreeze(!$account->isFreeze());//reverse, if account is freeze ~> unfreeze or else
+            Console::writeLine('Now account ' . $account->getId() . ' is ' . ($account->isFreeze() ? 'freeze' : 'unfreeze'));
+        }
+    }
+
+    /**
+     * Change Primary Account
+     * @param $account
+     */
+    public function changePrimaryAccount($account)
+    {
+        /*virtual account and old primary account cannot set to primary account*/
+        $defaultAccount = $this->getDefaultAccount();
+        if ($defaultAccount->getId() == $account->getId()) {
+            Console::writeLine('Notice: this account is identical to the old primary account');
+        } else if ($account->getCurrency()->isVirtualCurrency()) {
+            Console::writeLine('Notice: virtual account cannot set to primary account');
+        } else {
+            $this->setDefaultAccount($account);
+            Console::writeLine('Now account ' . $account->getId() . ' is primary account');
         }
     }
 
@@ -86,7 +229,8 @@ class Customer
      * @param array $customers
      * @return bool
      */
-    public function login($id, array $customers)
+    public
+    function login($id, array $customers)
     {
         if (count($customers) > 0) {
             for ($i = 0; $i < count($customers); ++$i) {
@@ -104,7 +248,8 @@ class Customer
      * @param array $customers
      * @return bool
      */
-    public function isUnique(array $customers)
+    public
+    function isUnique(array $customers)
     {
         //if $customers bigger than 0 ~> need check. else just return true
         if (count($customers) > 0) {
@@ -155,7 +300,8 @@ class Customer
     /**
      * @return array
      */
-    public function getAccounts()
+    public
+    function getAccounts()
     {
         return $this->accounts;
     }
@@ -166,7 +312,8 @@ class Customer
      * @param $id
      * @return bool
      */
-    public function getAccountById($id)
+    public
+    function getAccountById($id)
     {
         $accounts = $this->accounts;
         for ($i = 0; $i < count($this->accounts); ++$i) {

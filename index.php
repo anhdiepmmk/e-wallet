@@ -99,78 +99,64 @@ class Program
     {
     }
 
+    /**
+     * Withdraw
+     */
     function withdraw()
     {
+        Console::writeLine('Do you want withdraw money ?');
+        $this->customer->printAccounts();
+
+        // Get account which user want to withdraw
+        $account = $this->customer->chooseAccount();
+
+        if ($account instanceof Account) {
+
+            //check account has freeze
+            if ($account->isFreeze()) {
+                Console::writeLine('Notice: this account has been freeze, you must unfreeze to do this action');
+            } else {
+
+                //check is virtual currency
+                if ($account->getCurrency()->isVirtualCurrency()) {
+                    Console::writeLine('Notice: virtual account cannot withdraw money');
+                } else {
+                    //Get amount from user
+                    $amount = $this->customer->inputAmount($account);
+
+                    //Do withdraw to account
+                    if (is_double($amount)) {
+                        $this->customer->withdraw($account, $amount);
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * Deposit
+     */
     function deposit()
     {
         Console::writeLine('Do you want deposit money ?');
         $this->customer->printAccounts();
 
         // Get account which user want to deposit
-        $account = Console::loop(function () {
-            Console::writeLine('Enter your account id you want to deposit (or you can type --back to back to previous screen): ');
-            $id = trim(Console::readLine());
-
-            if (!empty($id)) {
-                //with input --back we support user back to previous screen
-                if ($id == '--back')
-                    return true;
-
-                //use regex to check data type is integer
-                if (preg_match('/^[-+]?\d+$/', $id)) {
-                    //find account by id
-                    $account = $this->customer->getAccountById($id);
-                    //check account exist
-                    if ($account) {
-                        return $account;
-                    } else {
-                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
-                    }
-                } else {
-                    Console::writeLine('Notice: your account id must be integer number');
-                }
-            } else {
-                Console::writeLine('Notice: your account id cannot be empty');
-            }
-            return false;
-        });
+        $account = $this->customer->chooseAccount();
 
         if ($account instanceof Account) {
-            //Get amount from user
-            $amount = Console::loop(function ($account) {
-                //Get input from keyboard
-                Console::writeLine('Please enter the number of the ' . $account->getCurrency()->getCode() . ' you want to send: ');
-                $amount = trim(Console::readLine());
 
-                //validate
-                if (!empty($amount)) {
-                    //with input --back we support user back to previous screen
-                    if ($amount == '--back')
-                        return true;
+            //check account has freeze
+            if ($account->isFreeze()) {
+                Console::writeLine('Notice: this account has been freeze, you must unfreeze to do this action');
+            } else {
+                //Get amount from user
+                $amount = $this->customer->inputAmount($account);
 
-                    if (is_numeric($amount)) {
-                        $amount = (double)$amount;
-                        if ($account > 0) {
-                            return $amount;
-                        } else {
-                            Console::writeLine('Notice: your amount must be larger than 0');
-                        }
-                    } else {
-                        Console::writeLine('Notice: your amount must be numeric');
-                    }
-
-                } else {
-                    Console::writeLine('Notice: your amount cannot be empty');
+                //Do deposit to account
+                if (is_double($amount)) {
+                    $this->customer->deposit($account, $amount);
                 }
-            }, $account);
-
-            //Do deposit to account
-            if (is_double($amount)) {
-                $newBalance = (double)$account->getBalance() + $amount;
-                $account->setBalance($newBalance);
-                Console::writeLine('You did deposit ' . $amount . ' USD to account ' . $account->getId());
             }
         }
     }
@@ -218,8 +204,6 @@ class Program
             return $currency;
         });
 
-        //Console::writeLine('Your currency info: ' . $currency->getCode() . ' - ' . $currency->getCountryName());
-
         //create an account with input above
         $account = new Account();
         $account->setId(\Models\SequenceAccount::getSequence());
@@ -242,43 +226,12 @@ class Program
         Console::writeLine('Do you want freeze/unfreeze account ?');
         $this->customer->printAccounts();
 
-        Console::loop(function () {
-            Console::writeLine('Enter your account id you want to freeze/unfreeze (or you can type --back to back to previous screen): ');
-            $id = trim(Console::readLine());
+        // Get account which user want to freeze/unfreeze
+        $account = $this->customer->chooseAccount();
 
-            if (!empty($id)) {
-                //with input --back we support user back to previous screen
-                if ($id == '--back')
-                    return true;
-
-                //use regex to check data type is integer
-                if (preg_match('/^[-+]?\d+$/', $id)) {
-                    //find account by id
-                    $account = $this->customer->getAccountById($id);
-                    //check account exist
-                    if ($account) {
-                        if ($account->getCurrency()->isVirtualCurrency()) {
-                            Console::writeLine('Notice: cannot freeze this account');
-                        } else {
-                            $account->setFreeze(!$account->isFreeze());//reverse, if account is freeze ~> unfreeze or else
-                            Console::writeLine('Now account ' . $id . ' is ' . ($account->isFreeze() ? 'freeze' : 'unfreeze'));
-                            return true;
-                        }
-
-                    } else {
-                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
-                    }
-                } else {
-                    Console::writeLine('Notice: your account id must be integer number');
-                }
-            } else {
-                Console::writeLine('Notice: your account id cannot be empty');
-            }
-
-            return false;
-        });
-
-
+        if ($account instanceof Account) {
+            $this->customer->freezeOrUnFreeze($account);
+        }
     }
 
     /**
@@ -290,43 +243,13 @@ class Program
         Console::writeLine('Do you want change primary account ?');
         $this->customer->printAccounts();
 
+        // Get account which user want to change primary account
+        $account = $this->customer->chooseAccount();
 
-        Console::loop(function () {
-            Console::writeLine('Enter your account id you want to set primary (or you can type --back to back to previous screen): ');
-            $id = trim(Console::readLine());
 
-            if (!empty($id)) {
-                //with input --back we support user back to previous screen
-                if ($id == '--back')
-                    return true;
-
-                //use regex to check data type is integer
-                if (preg_match('/^[-+]?\d+$/', $id)) {
-                    //find account by id
-                    $account = $this->customer->getAccountById($id);
-                    //check account exist
-                    if ($account) {
-                        $defaultAccount = $this->customer->getDefaultAccount();
-                        if ($defaultAccount->getId() == $account->getId()) {
-                            Console::writeLine('Notice: this account is identical to the old primary account');
-                        } else if ($account->getCurrency()->isVirtualCurrency()) {
-                            Console::writeLine('Notice: virtual account cannot set to primary account');
-                        } else {
-                            $this->customer->setDefaultAccount($account);
-                            Console::writeLine('Now account ' . $id . ' is primary account');
-                            return true;
-                        }
-                    } else {
-                        Console::writeLine('Notice: account not found, maybe you enter incorrect account id');
-                    }
-                } else {
-                    Console::writeLine('Notice: your account id must be integer number');
-                }
-            } else {
-                Console::writeLine('Notice: your account id cannot be empty');
-            }
-            return false;
-        });
+        if ($account instanceof Account) {
+            $this->customer->changePrimaryAccount($account);
+        }
     }
 
     /**
@@ -458,6 +381,8 @@ class Program
 //invoke main function, main function is where first call
 $program = new Program();
 $program->main();
+
+
 
 
 

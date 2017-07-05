@@ -61,7 +61,7 @@ class CurrencyConverter
         //close curl
         curl_close($ch);
 
-        return 0;
+        return -1;
     }
 
 

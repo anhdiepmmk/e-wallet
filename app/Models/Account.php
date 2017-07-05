@@ -71,7 +71,7 @@ class Account
      */
     public function getBalance()
     {
-        return $this->balance;
+        return (double)$this->balance;
     }
 
     /**
@@ -79,7 +79,7 @@ class Account
      */
     public function setBalance($balance)
     {
-        $this->balance = $balance;
+        $this->balance = (double)$balance;
     }
 
     /**
