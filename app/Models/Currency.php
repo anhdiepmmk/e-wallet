@@ -294,4 +294,10 @@ class Currency
     {
         $this->countryName = $countryName;
     }
+
+    function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return  'code = ' . $this->code . ' country name = ' . $this->countryName;
+    }
 }

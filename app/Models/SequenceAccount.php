@@ -13,6 +13,10 @@ class SequenceAccount
 {
     private static $sequence = 0;
 
+    /**
+     * Auto generate id for account object
+     * @return int
+     */
     public static function getSequence()
     {
         return ++static::$sequence;

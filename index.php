@@ -110,7 +110,7 @@ class Program
             Console::writeLine('Enter your account name: ');
             $name = trim(Console::readLine());
 
-            //validate name
+            //Validate name
             if (strlen($name) <= 0) {
                 Console::writeLine('Notice: your account name cannot be empty');
                 return false;
@@ -118,20 +118,42 @@ class Program
             return $name;
         });
 
-
-        //Get currency code
+        //Get currency
         Currency::printCurrencies();
-        $code = Console::loop(function () {
+        $currency = Console::loop(function () {
             Console::writeLine('Enter your currency code (reference currencies list above): ');
             $code = trim(Console::readLine());
+
+            //Validate code
             if (empty($code)) {
                 Console::writeLine('Notice: your currency code cannot be empty');
                 return false;
+            } elseif (strlen($code) != 3) {
+                Console::writeLine('Notice: your currency code must be length 3 character');
+                return false;
             }
-            return $code;
+
+            //find currency object by input code
+            $currency = Currency::getCurrencyByCode(strtoupper($code));
+            if (!$currency) {
+                Console::writeLine('Notice: your currency code do not match any code in currencies list above');
+            }
+            return $currency;
         });
 
-        Console::writeLine('code: ' . $code);
+        //Console::writeLine('Your currency info: ' . $currency->getCode() . ' - ' . $currency->getCountryName());
+
+        //create an account with input above
+        $account = new Account();
+        $account->setId(\Models\SequenceAccount::getSequence());
+        $account->setBalance(0.0);
+        $account->setCurrency($currency);
+        $account->setName($name);
+
+        //store to array list
+        $this->customer->addAccounts($account);
+
+        Console::writeLine('Your account created, here is info: ' . $account);
     }
 
     function changePrimaryAccount()

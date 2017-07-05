@@ -18,10 +18,9 @@ class Console
      */
     public static function loop($callback)
     {
-        $done = false;
         do {
             $done = $callback();
-        } while (!$done);
+        } while (is_bool($done) && !$done);
         return $done;
     }
 

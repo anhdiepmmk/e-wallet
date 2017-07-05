@@ -49,7 +49,6 @@ class Account
     }
 
 
-
     /**
      * @return mixed
      */
@@ -82,6 +81,12 @@ class Account
         $this->balance = $balance;
     }
 
-
+    function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return 'id = ' . $this->id . PHP_EOL .
+            'currency (' . $this->currency. ')' . PHP_EOL .
+            'balance = ' . $this->balance;
+    }
 
 }
