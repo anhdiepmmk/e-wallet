@@ -50,7 +50,11 @@ class Program
     }
 
 
-    function afterLogin()
+    /**
+     * Control panel for customer
+     * Customer can do any things with their account option
+     */
+    function customerControlPanel()
     {
         Console::loop(function () {
             $this->printMenuCustomer();
@@ -296,7 +300,7 @@ class Program
 
         //if user created we are going to next screen
         if (!$flag) {
-            $this->afterLogin();
+            $this->customerControlPanel();
         }
 
     }
@@ -336,7 +340,7 @@ class Program
         } while ($flag);
 
         if (!$flag) {
-            $this->afterLogin();
+            $this->customerControlPanel();
         }
 
     }
