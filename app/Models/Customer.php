@@ -9,6 +9,8 @@
 namespace Models;
 
 
+use Utils\Console;
+
 class Customer
 {
     private $id;
@@ -20,21 +22,22 @@ class Customer
      * @param $id
      * @return Customer
      */
-    public static function getDefault($id){
+    public static function getDefault($id)
+    {
         $customer = new Customer();
 
         //init virtual account
         $virtualAccount = new Account();
         $virtualAccount->setId(SequenceAccount::getSequence());
         $virtualAccount->setName('Credits');
-        $virtualAccount->setCurrency(Constant::DEFAULT_CURRENCY);
+        $virtualAccount->setCurrency(Currency::getVirtualCurrency());
         $virtualAccount->setBalance(0.0);
 
         //init usd account
         $usdAccount = new Account();
         $usdAccount->setId(SequenceAccount::getSequence());
         $usdAccount->setName('United States Dollar');
-        $usdAccount->setCurrency('USD');
+        $usdAccount->setCurrency(Currency::getCurrencyByCode('USD'));
         $usdAccount->setBalance(0.0);
 
         //binding data to customer object
@@ -46,8 +49,31 @@ class Customer
         return $customer;
     }
 
-    public function printAccounts(){
+    /**
+     * Print all account to screen
+     */
+    public function printAccounts()
+    {
+        Console::writeLine('You have ' . count($this->accounts) . ' account: ');
+        for ($i = 0; $i < count($this->accounts); ++$i) {
+            $account = $this->accounts[$i];
+            Console::write($account->getId() .
+                ' - ' . $account->getName() .
+                ' - ' . $account->getBalance() .
+                ' ' . $account->getCurrency()->getCode());
 
+            //if account is default account will break line and print text notice for user it is primary account
+            if ($account->getId() == $this->defaultAccount->getId()) {
+                Console::writeLine(' (Primary account)');
+            } else {
+                Console::writeLine('');
+            }
+        }
+    }
+
+    public function transfer($fromAccount, $toAccount, $amount)
+    {
+        //
     }
 
     /**

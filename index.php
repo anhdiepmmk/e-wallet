@@ -43,39 +43,99 @@ class Program
         Console::writeLine('3. Withdraw your money');
         Console::writeLine('4. Deposit your money');
         Console::writeLine('5. Add new an account');
-        Console::writeLine('6. Exit');
+        Console::writeLine('6. Change Primary account');
+        Console::writeLine('7. Logout');
         Console::writeLine('------------------------------');
     }
 
-    /**
-     * Print all currency to screen
-     */
-    function printCurrencies()
+
+    function afterLogin()
     {
-        $currencies = Currency::getCurrencies();
-
-        for ($i = 0; $i < count($currencies); ++$i) {
-            $currency = $currencies[$i];
-            Console::writeLine(($i + 1) . ' - ' . $currency->getCode() . ' - ' . $currency->getCountryName());
-        }
-    }
-
-    function afterLogin(){
-        do{
+        $flag = true;
+        do {
             $this->printMenuCustomer();
             $choice = Console::readLine();
 
-            switch ($choice){
-                case 1:
+            switch ($choice) {
+                case Constant::MENU_CUSTOMER_GET_LIST_ACCOUNT:
+                    $this->customer->printAccounts();
                     break;
-                case 1:
+                case Constant::MENU_CUSTOMER_TRANSFER:
+                    $this->transfer();
                     break;
-                case 1:
+                case Constant::MENU_CUSTOMER_WITHDRAW:
+                    $this->withdraw();
                     break;
-                case 1:
+                case Constant::MENU_CUSTOMER_DEPOSIT:
+                    $this->deposit();
+                    break;
+                case Constant::MENU_CUSTOMER_ADD_ACCOUNT:
+                    $this->addAccount();
+                case Constant::MENU_CUSTOMER_CHANGE_PRIMARY_ACCOUNT:
+                    $this->changePrimaryAccount();
+                    break;
+                case Constant::MENU_CUSTOMER_LOGOUT:
+                    $flag = false;//end this loop
+                    $this->customer = null;//clear session
+                    Console::writeLine('Goodbye !!!');
+                    break;
+                default:
+                    Console::writeLine('Please enter correct choice: ');
                     break;
             }
-        }while(true);
+        } while ($flag);
+    }
+
+    function transfer()
+    {
+    }
+
+    function withdraw()
+    {
+    }
+
+    function deposit()
+    {
+    }
+
+    /**
+     * Add new an account
+     */
+    function addAccount()
+    {
+        Console::writeLine('Do you want create an new account ?');
+
+        //Get name from keyboard
+        $name = Console::loop(function () {
+            Console::writeLine('Enter your account name: ');
+            $name = trim(Console::readLine());
+
+            //validate name
+            if (strlen($name) <= 0) {
+                Console::writeLine('Notice: your account name cannot be empty');
+                return false;
+            }
+            return $name;
+        });
+
+
+        //Get currency code
+        Currency::printCurrencies();
+        $code = Console::loop(function () {
+            Console::writeLine('Enter your currency code (reference currencies list above): ');
+            $code = trim(Console::readLine());
+            if (empty($code)) {
+                Console::writeLine('Notice: your currency code cannot be empty');
+                return false;
+            }
+            return $code;
+        });
+
+        Console::writeLine('code: ' . $code);
+    }
+
+    function changePrimaryAccount()
+    {
     }
 
     /**
@@ -148,7 +208,7 @@ class Program
 
                     //if return data type is Customer ~> Login success
                     if ($result instanceof Customer) {
-                        $this->customer = $customer;
+                        $this->customer = $result;
                         Console::writeLine('Welcome back ' . $result->getId());
 
                         $flag = false;

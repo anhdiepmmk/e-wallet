@@ -9,6 +9,8 @@
 namespace Models;
 
 
+use Utils\Console;
+
 class Currency
 {
 
@@ -16,6 +18,15 @@ class Currency
     private $countryName;
 
     private static $currencies = null;
+
+    /**
+     * Get Virtual Currency
+     * @return Currency
+     */
+    public static function getVirtualCurrency()
+    {
+        return new Currency('CREDITS', 'Unknown');
+    }
 
     /**
      * Get all currency of the world
@@ -193,6 +204,21 @@ class Currency
     }
 
     /**
+     * Print all currency to screen
+     */
+    public static function printCurrencies()
+    {
+        $currencies = Currency::getCurrencies();
+
+        Console::writeLine('code --- country name');
+        for ($i = 0; $i < count($currencies); ++$i) {
+            $currency = $currencies[$i];
+            Console::writeLine($currency->getCode() . ' - ' . $currency->getCountryName());
+        }
+        Console::writeLine('code --- country name');
+    }
+
+    /**
      * Currency constructor.
      * @param $code
      * @param $countryName
@@ -201,6 +227,40 @@ class Currency
     {
         $this->code = $code;
         $this->countryName = $countryName;
+    }
+
+    /**
+     * Check currency is virtual or not
+     * @return bool
+     */
+    public function isVirtualCurrency()
+    {
+        return ($this->code === static::getVirtualCurrency()->code);
+    }
+
+
+    /**
+     * Find and return currency by code
+     * @param $code
+     * @return bool
+     */
+    public static function getCurrencyByCode($code)
+    {
+        $currencies = static::getCurrencies();
+        for ($i = 0; $i < count($currencies); ++$i) {
+            $currency = $currencies[$i];
+            if ($code === $currency->getCode()) {
+                return $currency;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $index
+     */
+    public static function getCurrencyByIndex($index){
+
     }
 
     /**
